@@ -1,4 +1,4 @@
-;;; proto-eval.el --- Evaluate arbitrary languages inside Emacs
+;;; eval-proto.el --- Evaluate interpreted languages inside Emacs
 
 ;; Copyright (C) 2017  Hershal Bhave
 
@@ -26,16 +26,16 @@
 
 ;; if it can't find the version of the language you're using in this mapping,
 ;; look for the shebang.
-(setq proto-eval-mode-interpreter-mapping
+(setq eval-proto-mode-interpreter-mapping
       '((js2-mode . ("node" "")) (ruby . ("ruby" ""))
         (emacs-lisp-mode . ("something" ""))))
 
-(defun proto-eval/get-interpreter ()
+(defun eval-proto/get-interpreter ()
   (alist-get major-mode
-             proto-eval-mode-interpreter-mapping
-             (proto-eval/get-shebang) t))
+             eval-proto-mode-interpreter-mapping
+             (eval-proto/get-shebang) t))
 
-(defun proto-eval/get-shebang ()
+(defun eval-proto/get-shebang ()
   (save-excursion
     (goto-char 0)
     (let ((str (thing-at-point 'line t)))
@@ -48,21 +48,21 @@
                 (mapconcat 'identity (cdr interpreter-and-list) " ")))))))
 
 
-(defun proto-eval/eval (&optional prefix interpreter args)
+(defun eval-proto/eval (&optional prefix interpreter args)
   "Evalute the current buffer (or region if mark-active), and
 print the result in the message buffer. When given a prefix
 argument, also push the results into the kill-ring."
   (interactive "P")
   (if-let ((interpreter-and-args
             (cond
-             ((proto-eval/get-shebang)
-              (proto-eval/get-shebang))
-             ((proto-eval/get-interpreter)
-              (proto-eval/get-interpreter))
+             ((eval-proto/get-shebang)
+              (eval-proto/get-shebang))
+             ((eval-proto/get-interpreter)
+              (eval-proto/get-interpreter))
              )))
       (let ((contents
-             (proto-eval/eval-backend
-              (concat "*proto-eval*")
+             (eval-proto/eval-backend
+              (concat "*eval-proto*")
               (car interpreter-and-args)
               (cadr interpreter-and-args))))
         (when prefix (kill-new contents))
@@ -70,7 +70,7 @@ argument, also push the results into the kill-ring."
     (message "Could not determine interpreter executable for this buffer")))
 
 
-(defun proto-eval/eval-backend (buffer process args)
+(defun eval-proto/eval-backend (buffer process args)
   "Evaluate the current buffer (or region if mark-active), and
 return the result"
   ;; delete the contents of `buffer`
@@ -102,5 +102,5 @@ return the result"
       (buffer-string))))
 
 
-(provide 'proto-eval)
-;;; proto-eval.el ends here
+(provide 'eval-proto)
+;;; eval-proto.el ends here
