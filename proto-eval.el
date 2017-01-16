@@ -73,11 +73,10 @@ argument, also push the results into the kill-ring."
 (defun proto-eval/eval-backend (buffer process args)
   "Evaluate the current buffer (or region if mark-active), and
 return the result"
-  ;; delete the contents of the current node buffer
+  ;; delete the contents of `buffer`
   (when (get-buffer buffer)
     (with-current-buffer buffer
       (delete-region (point-min) (point-max))))
-  ;; Setup some variables
   (let ((debug-on-error t) (start 1) (end 1))
     ;; If the mark is active, set the point and mark to the selected region;
     ;; else select the entire buffer.
@@ -93,9 +92,9 @@ return the result"
     ;; arguments `args`. This will popluate the `buffer` with the results.
     (call-process-region
      start end     ; seems the order does not matter
-     process
+     process       ; the process to call
      nil           ; don't delete region
-     buffer
+     buffer        ; the buffer to populate
      nil           ; no redisply during output
      args)         ; the rest of the arguments
     (setq deactivate-mark t)
