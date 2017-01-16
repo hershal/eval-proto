@@ -1,4 +1,4 @@
-;;; proto-eval.el --- Evaluate arbitrary languages inside Emacs  -*- lexical-binding: t; -*-
+;;; proto-eval.el --- Evaluate arbitrary languages inside Emacs
 
 ;; Copyright (C) 2017  Hershal Bhave
 
