@@ -62,7 +62,7 @@ argument, also push the results into the kill-ring."
              )))
       (let ((contents
              (proto-eval/eval-backend
-              (concat "*eval-" (car interpreter-and-args) "*")
+              (concat "*proto-eval*")
               (car interpreter-and-args)
               (cadr interpreter-and-args))))
         (when prefix (kill-new contents))
