@@ -90,13 +90,12 @@ return the result"
 
     ;; Send the input from `start` to `end` through stdin to the `process` with
     ;; arguments `args`. This will popluate the `buffer` with the results.
-    (call-process-region
+    (shell-command-on-region
      start end     ; seems the order does not matter
-     process       ; the process to call
-     nil           ; don't delete region
+     (string-join (append (list process) (split-string args " ")) " ")
      buffer        ; the buffer to populate
      nil           ; no redisply during output
-     args)         ; the rest of the arguments
+     )         ; the rest of the arguments
     (setq deactivate-mark t)
     (with-current-buffer buffer
       (buffer-string))))
