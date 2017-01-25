@@ -18,8 +18,9 @@ emacs. How cool is that?
 # Setup
 
 All you have to do is bind a key to `eval-proto/eval`. eval-proto will
-automatically pick up the shebang from your buffer and run the interpreter you
-specify. You don't even have to save the buffer!
+automatically pick up the shebang from your buffer and run the command you
+specify, piping in the file as input to the command. You don't even have to save
+the buffer!
 
 # Example
 
