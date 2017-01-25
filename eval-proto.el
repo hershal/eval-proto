@@ -57,12 +57,8 @@ print the result in the message buffer. When given a prefix
 argument, also push the results into the kill-ring."
   (interactive "P")
   (if-let ((command
-            (cond
-             ((eval-proto/get-shebang)
-              (eval-proto/get-shebang))
-             ((eval-proto/get-interpreter)
-              (eval-proto/get-interpreter))
-             )))
+            (or (eval-proto/get-shebang)
+                (eval-proto/get-interpreter))))
       (let ((contents
              (eval-proto/eval-backend
               (concat "*eval-proto*")
