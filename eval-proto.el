@@ -38,22 +38,25 @@
 (defun eval-proto/get-shebang ()
   (save-excursion
     (goto-char 0)
-    (let ((str (thing-at-point 'line t)))
-      (if (or (< (length str) 3)
-              (not (string-equal (substring str 0 2) "#!")))
-          nil
-        (let ((interpreter-and-list
-               (split-string (substring str 2 -1) " ")))
-          (list (car interpreter-and-list)
-                (mapconcat 'identity (cdr interpreter-and-list) " ")))))))
+    (if-let ((str (thing-at-point 'line t))
+             (executable-string (eval-proto/get-executable-string str)))
+        executable-string
+      nil)))
 
+(defun eval-proto/get-executable-string (firstline)
+  (if (< (length str) 3) nil
+    (substring
+     (s-trim
+      (replace-regexp-in-string
+       "\\(/\\*\\)\\|\\(\\*/\\)\\|\\(//\\)" "" firstline))
+     2)))
 
-(defun eval-proto/eval (&optional prefix interpreter args)
+(defun eval-proto/eval (&optional prefix command)
   "Evalute the current buffer (or region if mark-active), and
 print the result in the message buffer. When given a prefix
 argument, also push the results into the kill-ring."
   (interactive "P")
-  (if-let ((interpreter-and-args
+  (if-let ((command
             (cond
              ((eval-proto/get-shebang)
               (eval-proto/get-shebang))
@@ -63,14 +66,13 @@ argument, also push the results into the kill-ring."
       (let ((contents
              (eval-proto/eval-backend
               (concat "*eval-proto*")
-              (car interpreter-and-args)
-              (cadr interpreter-and-args))))
+              command)))
         (when prefix (kill-new contents))
         (message "%s" contents))
     (message "Could not determine interpreter executable for this buffer")))
 
 
-(defun eval-proto/eval-backend (buffer process args)
+(defun eval-proto/eval-backend (buffer command)
   "Evaluate the current buffer (or region if mark-active), and
 return the result"
   ;; delete the contents of `buffer`
@@ -92,7 +94,7 @@ return the result"
     ;; arguments `args`. This will popluate the `buffer` with the results.
     (shell-command-on-region
      start end     ; seems the order does not matter
-     (string-join (append (list process) (split-string args " ")) " ")
+     command
      buffer        ; the buffer to populate
      nil           ; no redisply during output
      )         ; the rest of the arguments
