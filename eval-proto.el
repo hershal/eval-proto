@@ -69,7 +69,7 @@ argument, also push the results into the kill-ring."
               command)))
         (when prefix (kill-new contents))
         (message "%s" contents))
-    (message "Could not determine interpreter executable for this buffer")))
+    (message "Could not determine executable command for this buffer")))
 
 
 (defun eval-proto/eval-backend (buffer command)
