@@ -24,8 +24,6 @@
 
 ;;; Code:
 
-;; (require 'subr-x)
-
 (defvar eval-proto-mode-interpreter-mapping
   '((js2-mode . ("node" "")) (ruby . ("ruby" ""))
     (emacs-lisp-mode . ("something" ""))))
