@@ -12,20 +12,17 @@
 
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.   If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
 ;;
 
 ;;; Code:
-
-;; if it can't find the version of the language you're using in this mapping,
-;; look for the shebang.
 
 ;; (require 'subr-x)
 
@@ -34,31 +31,37 @@
     (emacs-lisp-mode . ("something" ""))))
 
 (defun eval-proto/get-interpreter ()
+  "This function will return the interpreter of the current file
+based on the current `major-mode'. The interpreter is retrieved
+by the `major-mode' mapping stored in
+`eval-proto-mode-interpreter-mapping'. Customize the mapping in
+`eval-proto-mode-interpreter-mapping' to change the automatically
+determined interpreter."
   (alist-get major-mode
              eval-proto-mode-interpreter-mapping
              (eval-proto/get-shebang) t))
 
 (defun eval-proto/get-shebang ()
+  "Get the shell command to run current buffer based on the
+shebang line."
   (save-excursion
     (goto-char 0)
-    (eval-proto/get-executable-string
-     (thing-at-point 'line t))))
+    (if (< (length firstline) 3) nil
+      (substring
+       (eval-proto/string-trim
+        (replace-regexp-in-string
+         "\\(/\\*\\)\\|\\(\\*/\\)\\|\\(//\\)" "" firstline))
+       2))))
 
 (defun eval-proto/string-trim (str)
+  "Return a string without leading and trailing whitespace. `STR'
+is the input string to trim."
   (replace-regexp-in-string "^[[:space:]]*\\([^[:space:]]*\\)[[:space:]]$" "\1" str))
 
-(defun eval-proto/get-executable-string (firstline)
-  (if (< (length firstline) 3) nil
-    (substring
-     (eval-proto/string-trim
-      (replace-regexp-in-string
-       "\\(/\\*\\)\\|\\(\\*/\\)\\|\\(//\\)" "" firstline))
-     2)))
-
-(defun eval-proto/eval (&optional prefix command)
-  "Evalute the current buffer (or region if mark-active), and
-print the result in the message buffer. When given a prefix
-argument, also push the results into the kill-ring."
+(defun eval-proto/eval (&optional prefix)
+  "Evalute the current buffer or region with the buffer's
+shebang, and print the result in the minibuffer. When given
+`PREFIX', also push the results into the `kill-ring'."
   (interactive "P")
   (let* ((command
           (or (eval-proto/get-shebang)
@@ -69,16 +72,16 @@ argument, also push the results into the kill-ring."
         (message contents)
       (progn (when prefix (kill-new contents))
              (message (concat "Could not determine executable command for this"
-                              " buffer. You can fix this by adding to"
-                              "`eval-proto-mode-interpreter-mapping`"))
+                              " buffer.  You can fix this by adding to"
+                              "`eval-proto-mode-interpreter-mapping'"))
              )
       )))
 
 
 (defun eval-proto/eval-backend (buffer command)
-  "Evaluate the current buffer (or region if mark-active), and
-return the result"
-  ;; delete the contents of `buffer`
+  "Evaluate `BUFFER' with `COMMAND', and return the result."
+
+  ;; delete the contents of `buffer'
   (when (get-buffer buffer)
     (with-current-buffer buffer
       (delete-region (point-min) (point-max))))
@@ -93,8 +96,8 @@ return the result"
       (setq start (point-min))
       (setq end (point-max))))
 
-    ;; Send the input from `start` to `end` through stdin to the `process` with
-    ;; arguments `args`. This will popluate the `buffer` with the results.
+    ;; Send the input from `start' to `end' through stdin to the `process' with
+    ;; arguments `args'.  This will popluate the `buffer' with the results.
     (shell-command-on-region
      start end     ; seems the order does not matter
      command
