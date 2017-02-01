@@ -45,12 +45,13 @@ determined interpreter."
 shebang line."
   (save-excursion
     (goto-char 0)
-    (if (< (length firstline) 3) nil
-      (substring
-       (eval-proto/string-trim
-        (replace-regexp-in-string
-         "\\(/\\*\\)\\|\\(\\*/\\)\\|\\(//\\)" "" firstline))
-       2))))
+    (let ((firstline (thing-at-point 'line)))
+      (if (< (length firstline) 3) nil
+        (substring
+         (eval-proto/string-trim
+          (replace-regexp-in-string
+           "\\(/\\*\\)\\|\\(\\*/\\)\\|\\(//\\)" "" firstline))
+         2)))))
 
 (defun eval-proto/string-trim (str)
   "Return a string without leading and trailing whitespace. `STR'
