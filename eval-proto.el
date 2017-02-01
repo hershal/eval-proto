@@ -26,9 +26,12 @@
 
 ;; if it can't find the version of the language you're using in this mapping,
 ;; look for the shebang.
-(setq eval-proto-mode-interpreter-mapping
-      '((js2-mode . ("node" "")) (ruby . ("ruby" ""))
-        (emacs-lisp-mode . ("something" ""))))
+
+;; (require 'subr-x)
+
+(defvar eval-proto-mode-interpreter-mapping
+  '((js2-mode . ("node" "")) (ruby . ("ruby" ""))
+    (emacs-lisp-mode . ("something" ""))))
 
 (defun eval-proto/get-interpreter ()
   (alist-get major-mode
@@ -38,15 +41,16 @@
 (defun eval-proto/get-shebang ()
   (save-excursion
     (goto-char 0)
-    (if-let ((str (thing-at-point 'line t))
-             (executable-string (eval-proto/get-executable-string str)))
-        executable-string
-      nil)))
+    (eval-proto/get-executable-string
+     (thing-at-point 'line t))))
+
+(defun eval-proto/string-trim (str)
+  (replace-regexp-in-string "^[[:space:]]*\\([^[:space:]]*\\)[[:space:]]$" "\1" str))
 
 (defun eval-proto/get-executable-string (firstline)
-  (if (< (length str) 3) nil
+  (if (< (length firstline) 3) nil
     (substring
-     (s-trim
+     (eval-proto/string-trim
       (replace-regexp-in-string
        "\\(/\\*\\)\\|\\(\\*/\\)\\|\\(//\\)" "" firstline))
      2)))
@@ -56,16 +60,19 @@
 print the result in the message buffer. When given a prefix
 argument, also push the results into the kill-ring."
   (interactive "P")
-  (if-let ((command
-            (or (eval-proto/get-shebang)
-                (eval-proto/get-interpreter))))
-      (let ((contents
-             (eval-proto/eval-backend
-              (concat "*eval-proto*")
-              command)))
-        (when prefix (kill-new contents))
-        (message "%s" contents))
-    (message "Could not determine executable command for this buffer")))
+  (let* ((command
+          (or (eval-proto/get-shebang)
+              (eval-proto/get-interpreter)))
+         (contents
+          (eval-proto/eval-backend (concat "*eval-proto*") command)))
+    (if (and command contents)
+        (message contents)
+      (progn (when prefix (kill-new contents))
+             (message (concat "Could not determine executable command for this"
+                              " buffer. You can fix this by adding to"
+                              "`eval-proto-mode-interpreter-mapping`"))
+             )
+      )))
 
 
 (defun eval-proto/eval-backend (buffer command)
