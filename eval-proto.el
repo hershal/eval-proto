@@ -63,9 +63,7 @@ is the input string to trim."
 shebang, and print the result in the minibuffer. When given
 `PREFIX', also push the results into the `kill-ring'."
   (interactive "P")
-  (let* ((command
-          (or (eval-proto/get-shebang)
-              (eval-proto/get-interpreter)))
+  (let* ((command (eval-proto/get-interpreter))
          (contents
           (eval-proto/eval-backend (concat "*eval-proto*") command)))
     (if (and command contents)
