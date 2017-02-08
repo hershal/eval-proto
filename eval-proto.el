@@ -26,8 +26,8 @@
 ;;; Code:
 
 (defvar eval-proto-mode-interpreter-mapping
-  '((js2-mode . ("node" "")) (ruby . ("ruby" ""))
-    (emacs-lisp-mode . ("something" ""))))
+  '((js2-mode . "node") (ruby-mode . "ruby")
+    (emacs-lisp-mode . "emacs -Q --batch")))
 
 (defun eval-proto/get-interpreter ()
   "This function will return the interpreter of the current file
