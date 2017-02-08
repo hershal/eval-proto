@@ -25,19 +25,19 @@
 
 ;;; Code:
 
-(defvar eval-proto-mode-interpreter-mapping
+(defvar eval-proto-mode-interpreter-alist
   '((js2-mode . "node") (ruby-mode . "ruby")
     (emacs-lisp-mode . "emacs -Q --batch")))
 
 (defun eval-proto/get-interpreter ()
   "This function will return the interpreter of the current file
 based on the current `major-mode'. The interpreter is retrieved
-by the `major-mode' mapping stored in
-`eval-proto-mode-interpreter-mapping'. Customize the mapping in
-`eval-proto-mode-interpreter-mapping' to change the automatically
+by the `major-mode' alist stored in
+`eval-proto-mode-interpreter-alist'. Customize the alist in
+`eval-proto-mode-interpreter-alist' to change the automatically
 determined interpreter."
   (alist-get major-mode
-             eval-proto-mode-interpreter-mapping
+             eval-proto-mode-interpreter-alist
              (eval-proto/get-shebang) t))
 
 (defun eval-proto/get-shebang ()
@@ -71,7 +71,7 @@ shebang, and print the result in the minibuffer. When given
       (progn (when prefix (kill-new contents))
              (message (concat "Could not determine executable command for this"
                               " buffer.  You can fix this by adding to"
-                              "`eval-proto-mode-interpreter-mapping'"))
+                              "`eval-proto-mode-interpreter-alist'"))
              )
       )))
 
