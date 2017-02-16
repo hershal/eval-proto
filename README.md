@@ -1,5 +1,8 @@
 # eval-proto
 
+*prototype*, /n/: a first, typical or preliminary model of something, especially
+a machine, from which other forms are developed or copied.
+
 eval-proto is an emacs package which aims to help speed up prototyping through
 micro-development.
 
